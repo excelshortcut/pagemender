@@ -18,7 +18,6 @@
 
       <!-- Tool Preview Section -->
       <div class="relative max-w-4xl mx-auto bg-white rounded-lg shadow-lg p-8 mb-16">
-        <!-- Preview UI -->
         <div class="opacity-50">
           <div class="border-2 border-dashed border-gray-300 rounded-lg p-8 text-center mb-4">
             <p class="text-gray-500">Drag & Drop Document 1 Here</p>
@@ -63,40 +62,39 @@
           <p v-if="errorMessage" class="mt-2 text-red-500">{{ errorMessage }}</p>
         </div>
 
-        <!-- Email Signup -->
+        <!-- Email Signup via Mailchimp Form -->
         <div class="mt-8">
           <p class="text-lg text-gray-600 mb-8">
-            Don't have access? Subscribe to Data Accelerator Newsletter to receive your password
+            Don't have access? Subscribe to the Data Accelerator Newsletter to receive your password
           </p>
-          <div class="flex gap-4 mb-4">
+
+          <!-- Begin Mailchimp Signup Form -->
+          <form
+            action="https://excelshortcut.us20.list-manage.com/subscribe/post?u=753605d7a4378f7975e2f4941&id=01779f56c2"
+            method="post"
+            target="_blank"
+            novalidate
+            class="flex gap-4 justify-center items-center mb-4"
+          >
             <input
               type="email"
-              v-model="email"
+              name="EMAIL"
               placeholder="Enter your email address"
-              class="flex-1 px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-              :class="{ 'border-red-500': emailError }"
+              class="px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+              required
             />
-            <button
-              @click="submitEmail"
-              :disabled="isSubmitting"
-              class="bg-blue-500 text-white px-6 py-2 rounded-md hover:bg-blue-600 disabled:opacity-50"
-            >
-              {{ isSubmitting ? 'Subscribing...' : 'Get Access' }}
-            </button>
-          </div>
+            <input
+              type="submit"
+              value="Get Access"
+              name="subscribe"
+              class="bg-blue-500 text-white px-6 py-2 rounded-md hover:bg-blue-600 cursor-pointer"
+            />
+          </form>
+          <!--End mc_embed_signup-->
 
-          <p v-if="emailError" class="text-red-500 mb-4">{{ emailError }}</p>
-          <p v-if="subscriptionSuccess" class="text-green-500 mb-4">
-            Thank you for subscribing! Check your email for the access password.
-          </p>
-
-          <!-- Benefits -->
-          <div class="bg-gray-50 rounded-lg p-6 mt-8 text-left">
-            <div class="space-y-3">
-              <p class="text-gray-700">✓ Instant access to PageMender</p>
-              <p class="text-gray-700">✓ Weekly data insights and tools</p>
-              <p class="text-gray-700">✓ Document management tips and best practices</p>
-            </div>
+          <div id="mce-responses" class="clear">
+            <div class="response" id="mce-error-response" style="display:none;"></div>
+            <div class="response" id="mce-success-response" style="display:none;"></div>
           </div>
         </div>
       </div>
@@ -105,7 +103,6 @@
     <!-- Tool Interface (shown when authenticated) -->
     <div v-else class="max-w-4xl mx-auto px-4 py-8">
       <h1 class="text-3xl font-bold text-gray-900 mb-8">PageMender</h1>
-
       <div class="space-y-4">
         <div
           class="border-2 border-dashed border-gray-300 rounded-lg p-8 text-center hover:border-blue-500 transition-colors"
@@ -166,43 +163,9 @@ export default {
       doc2File: null,
       merging: false,
       mergedFile: null,
-      email: '',
-      emailError: '',
-      isSubmitting: false,
-      subscriptionSuccess: false
     };
   },
   methods: {
-    async submitEmail() {
-      if (!this.email) {
-        this.emailError = 'Please enter your email address';
-        return;
-      }
-      if (!this.validateEmail(this.email)) {
-        this.emailError = 'Please enter a valid email address';
-        return;
-      }
-
-      this.isSubmitting = true;
-      this.emailError = '';
-
-      try {
-        // Simulate API call
-        await new Promise(resolve => setTimeout(resolve, 1000));
-        this.subscriptionSuccess = true;
-        this.email = '';
-        // In real implementation, send password via email
-        this.authenticated = true; // For demo, auto-authenticate
-      } catch (error) {
-        this.emailError = 'Failed to subscribe. Please try again.';
-      } finally {
-        this.isSubmitting = false;
-      }
-    },
-    validateEmail(email) {
-      const re = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-      return re.test(email);
-    },
     checkPassword() {
       if (this.inputPassword === this.correctPassword) {
         this.authenticated = true;
@@ -216,7 +179,11 @@ export default {
     },
     onDrop(event, docTarget) {
       const files = event.dataTransfer.files;
-      if (files.length > 0 && files[0].type === 'application/vnd.openxmlformats-officedocument.wordprocessingml.document') {
+      if (
+        files.length > 0 &&
+        files[0].type ===
+        'application/vnd.openxmlformats-officedocument.wordprocessingml.document'
+      ) {
         if (docTarget === 'doc1') {
           this.doc1File = files[0];
         } else {
@@ -224,6 +191,52 @@ export default {
         }
       } else {
         alert('Please drop a valid Word (.docx) file.');
+      }
+    },
+    async mergeDocuments() {
+      if (!this.doc1File || !this.doc2File) return;
+      this.merging = true;
+
+      try {
+        const [doc1Content, doc2Content] = await Promise.all([
+          this.extractDocContent(this.doc1File),
+          this.extractDocContent(this.doc2File),
+        ]);
+
+        const doc = new Document({
+          creator: 'PageMender',
+          description: 'Merged document',
+          title: 'Combined Document',
+          sections: [
+            {
+              properties: {},
+              children: [
+                ...doc1Content.map(
+                  (text) =>
+                    new Paragraph({
+                      children: [new TextRun({ text })],
+                    })
+                ),
+                // Add a break between documents
+                new Paragraph({ children: [new TextRun({ text: '', break: true })] }),
+                ...doc2Content.map(
+                  (text) =>
+                    new Paragraph({
+                      children: [new TextRun({ text })],
+                    })
+                ),
+              ],
+            },
+          ],
+        });
+
+        const blob = await Packer.toBlob(doc);
+        this.mergedFile = URL.createObjectURL(blob);
+      } catch (error) {
+        console.error('Error merging documents:', error);
+        alert('An error occurred while merging documents.');
+      } finally {
+        this.merging = false;
       }
     },
     async extractDocContent(file) {
@@ -237,53 +250,14 @@ export default {
       const paragraphs = xmlDoc.getElementsByTagName('w:p');
 
       return Array.from(paragraphs)
-        .map(p => {
+        .map((p) => {
           const textElements = p.getElementsByTagName('w:t');
           return Array.from(textElements)
-            .map(t => t.textContent)
+            .map((t) => t.textContent)
             .join('')
             .trim();
         })
-        .filter(text => text);
-    },
-    async mergeDocuments() {
-      if (!this.doc1File || !this.doc2File) return;
-      this.merging = true;
-
-      try {
-        const [doc1Content, doc2Content] = await Promise.all([
-          this.extractDocContent(this.doc1File),
-          this.extractDocContent(this.doc2File)
-        ]);
-
-        const doc = new Document({
-          creator: "PageMender",
-          description: "Merged document",
-          title: "Combined Document",
-          sections: [{
-            properties: {},
-            children: [
-              ...doc1Content.map(text => new Paragraph({
-                children: [new TextRun({ text: text })]
-              })),
-              new Paragraph({
-                children: [new TextRun({ text: "", break: true })]
-              }),
-              ...doc2Content.map(text => new Paragraph({
-                children: [new TextRun({ text: text })]
-              }))
-            ]
-          }]
-        });
-
-        const blob = await Packer.toBlob(doc);
-        this.mergedFile = URL.createObjectURL(blob);
-      } catch (error) {
-        console.error('Error merging documents:', error);
-        alert('An error occurred while merging documents.');
-      } finally {
-        this.merging = false;
-      }
+        .filter((text) => text);
     },
     readFileAsArrayBuffer(file) {
       return new Promise((resolve, reject) => {
@@ -292,7 +266,11 @@ export default {
         reader.onerror = (error) => reject(error);
         reader.readAsArrayBuffer(file);
       });
-    }
-  }
+    },
+  },
 };
 </script>
+
+<style scoped>
+/* Additional styling can be placed here if needed */
+</style>
