@@ -1,10 +1,3 @@
-Below is an updated version of the template reflecting your requested changes:
-
-What’s Changed:
-•	Lock Placement: The lock icon and instructions are now placed to the right of the “Combine Documents” button, using the available whitespace.
-•	Greyed-Out Button: The “Combine Documents” button on the locked screen is now a lighter, grey color to clearly indicate it’s disabled.
-•	Interaction Blocking: A transparent overlay still prevents interaction without obscuring the view.
-
 <template>
   <div class="min-h-screen bg-gray-50">
     <!-- Landing Page (shown when not authenticated) -->
@@ -14,23 +7,23 @@ What’s Changed:
         <div class="text-2xl font-bold text-gray-800">PageMender</div>
       </nav>
 
-
       <!-- Hero Section -->
       <div class="text-center py-16">
         <h1 class="text-5xl font-bold text-gray-900 mb-6">PageMender</h1>
         <p class="text-xl text-gray-600 max-w-2xl mx-auto leading-relaxed">
           <span class="font-semibold">Tired of copy-pasting between Word documents?</span><br>
           <span class="block mt-4">
-      <strong>PageMender</strong> helps you effortlessly combine multiple Word documents into a
-      single, professionally formatted file.
-    </span>
+            <strong>PageMender</strong> helps you effortlessly combine multiple Word documents into a single file.
+          </span>
           <span class="block mt-4">
-      Whether you're merging project reports, course materials, or research papers,
-      our web-based tool preserves your formatting while unifying documents in seconds. ✨
-    </span>
+            Whether you're merging project reports, course materials, or research papers,
+            our web-based tool helps you unify documents in seconds. ✨
+          </span>
           <span class="block mt-4">
-      Start merging your Word files now with <strong>PageMender</strong>.
-    </span>
+            Start merging your Word files now with <strong>PageMender</strong>.
+            All you have to do is sign up for the Free "Data Accelerator" Newsletter and use the password
+            provided in your Welcome Email.
+          </span>
         </p>
       </div>
 
@@ -56,7 +49,7 @@ What’s Changed:
               <span class="text-xl">🔒</span>
               <div class="text-left">
                 <p class="text-sm font-semibold text-gray-800">Tool Locked</p>
-                <p class="text-xs text-gray-600">Subscribe to unlock</p>
+                <p class="text-xs text-gray-600">Enter password below to Unlock</p>
               </div>
             </div>
           </div>
@@ -67,62 +60,70 @@ What’s Changed:
       </div>
 
       <!-- Authentication Section -->
+      <!--
+        Stacked layout: "Unlock PageMender" section above the "No Access?" section.
+        Both sections now have a uniform style and ensure the email input is contained within the card.
+      -->
       <div class="max-w-2xl mx-auto text-center py-12">
-        <h2 class="text-3xl font-bold text-gray-900 mb-4">Get Access to PageMender</h2>
 
-        <!-- Password Input -->
-        <div class="mb-8 p-6 bg-white rounded-lg shadow-sm">
+        <!-- Unlock PageMender Card -->
+        <div class="flex flex-col items-center bg-white rounded-lg shadow-sm p-6 mb-8">
+          <h2 class="text-3xl font-bold text-gray-900 mb-4">Unlock PageMender</h2>
           <p class="text-lg text-gray-600 mb-4">Already have a password?</p>
-          <div class="flex gap-4 justify-center">
-            <input
-              type="password"
-              v-model="inputPassword"
-              placeholder="Enter password"
-              class="px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-            />
-            <button
-              @click="checkPassword"
-              class="bg-blue-500 text-white px-6 py-2 rounded-md hover:bg-blue-600"
-            >
-              Login
-            </button>
+          <div class="w-full max-w-md mx-auto">
+            <div class="flex flex-col sm:flex-row gap-4 justify-center mb-4">
+              <input
+                type="password"
+                v-model="inputPassword"
+                placeholder="Enter password"
+                class="flex-1 px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+              />
+              <button
+                @click="checkPassword"
+                class="bg-blue-500 text-white px-6 py-2 rounded-md hover:bg-blue-600"
+              >
+                Login
+              </button>
+            </div>
+            <p v-if="errorMessage" class="mt-2 text-red-500">{{ errorMessage }}</p>
           </div>
-          <p v-if="errorMessage" class="mt-2 text-red-500">{{ errorMessage }}</p>
         </div>
 
-        <!-- Email Signup via Mailchimp Form -->
-        <div class="mt-8">
-          <p class="text-lg text-gray-600 mb-8">
-            Don't have access? Subscribe to the Data Accelerator Newsletter to receive your password
+        <!-- No Access Card -->
+        <div class="flex flex-col items-center bg-white rounded-lg shadow-sm p-6">
+          <h2 class="text-3xl font-bold text-gray-900 mb-4">No Access?</h2>
+          <p class="text-lg text-gray-600 mb-8 text-center">
+            Subscribe to the Free Data Accelerator Newsletter to receive your password.
           </p>
+          <div class="w-full max-w-md mx-auto">
+            <!-- Begin Mailchimp Signup Form -->
+            <form
+              action="https://excelshortcut.us20.list-manage.com/subscribe/post?u=753605d7a4378f7975e2f4941&id=01779f56c2"
+              method="post"
+              target="_blank"
+              novalidate
+              class="flex flex-col sm:flex-row gap-4 justify-center items-center"
+            >
+              <input
+                type="email"
+                name="EMAIL"
+                placeholder="Enter your email address"
+                class="flex-1 px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                required
+              />
+              <input
+                type="submit"
+                value="Get Access"
+                name="subscribe"
+                class="bg-blue-500 text-white px-6 py-2 rounded-md hover:bg-blue-600 cursor-pointer"
+              />
+            </form>
+            <!--End mc_embed_signup-->
 
-          <!-- Begin Mailchimp Signup Form -->
-          <form
-            action="https://excelshortcut.us20.list-manage.com/subscribe/post?u=753605d7a4378f7975e2f4941&id=01779f56c2"
-            method="post"
-            target="_blank"
-            novalidate
-            class="flex gap-4 justify-center items-center mb-4"
-          >
-            <input
-              type="email"
-              name="EMAIL"
-              placeholder="Enter your email address"
-              class="px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-              required
-            />
-            <input
-              type="submit"
-              value="Get Access"
-              name="subscribe"
-              class="bg-blue-500 text-white px-6 py-2 rounded-md hover:bg-blue-600 cursor-pointer"
-            />
-          </form>
-          <!--End mc_embed_signup-->
-
-          <div id="mce-responses" class="clear">
-            <div class="response" id="mce-error-response" style="display:none;"></div>
-            <div class="response" id="mce-success-response" style="display:none;"></div>
+            <div id="mce-responses" class="clear w-full text-left mt-4">
+              <div class="response" id="mce-error-response" style="display:none;"></div>
+              <div class="response" id="mce-success-response" style="display:none;"></div>
+            </div>
           </div>
         </div>
       </div>
@@ -177,6 +178,24 @@ What’s Changed:
 </template>
 
 <script>
+/*
+  Overview:
+  This Vue component manages both locked (unauthenticated) and unlocked (authenticated) states.
+  Users either enter a password or subscribe to access. Once unlocked, they can drag & drop .docx
+  files and merge them.
+
+  Modular Functions:
+  - checkPassword: Validate input password
+  - onDragOver, onDrop: Handle drag & drop file inputs
+  - mergeDocuments: Combine two .docx files into one
+  - extractDocContent, readFileAsArrayBuffer: Utility to read and parse .docx files
+
+  Clean Code:
+  - Meaningful naming
+  - Comments explain code intent
+  - Modular, reusable functions
+*/
+
 import { Document, Paragraph, Packer, TextRun } from 'docx';
 import JSZip from 'jszip';
 
@@ -194,6 +213,7 @@ export default {
     };
   },
   methods: {
+    // Check entered password against correct password
     checkPassword() {
       if (this.inputPassword === this.correctPassword) {
         this.authenticated = true;
@@ -202,9 +222,13 @@ export default {
         this.errorMessage = 'Incorrect password.';
       }
     },
+
+    // Allow drop action (copy)
     onDragOver(event) {
       event.dataTransfer.dropEffect = 'copy';
     },
+
+    // Handle dropped file, assign to either doc1 or doc2
     onDrop(event, docTarget) {
       const files = event.dataTransfer.files;
       if (
@@ -221,6 +245,8 @@ export default {
         alert('Please drop a valid Word (.docx) file.');
       }
     },
+
+    // Merge two documents into a single file
     async mergeDocuments() {
       if (!this.doc1File || !this.doc2File) return;
       this.merging = true;
@@ -245,7 +271,7 @@ export default {
                       children: [new TextRun({ text })],
                     })
                 ),
-                // Add a break between documents
+                // Add a blank paragraph (line break) between documents
                 new Paragraph({ children: [new TextRun({ text: '', break: true })] }),
                 ...doc2Content.map(
                   (text) =>
@@ -267,6 +293,8 @@ export default {
         this.merging = false;
       }
     },
+
+    // Extract text from a .docx file
     async extractDocContent(file) {
       const arrayBuffer = await this.readFileAsArrayBuffer(file);
       const zip = new JSZip();
@@ -287,6 +315,8 @@ export default {
         })
         .filter((text) => text);
     },
+
+    // Read file as ArrayBuffer for parsing .docx
     readFileAsArrayBuffer(file) {
       return new Promise((resolve, reject) => {
         const reader = new FileReader();
