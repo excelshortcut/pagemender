@@ -1,3 +1,10 @@
+Below is an updated version of the template reflecting your requested changes:
+
+What’s Changed:
+•	Lock Placement: The lock icon and instructions are now placed to the right of the “Combine Documents” button, using the available whitespace.
+•	Greyed-Out Button: The “Combine Documents” button on the locked screen is now a lighter, grey color to clearly indicate it’s disabled.
+•	Interaction Blocking: A transparent overlay still prevents interaction without obscuring the view.
+
 <template>
   <div class="min-h-screen bg-gray-50">
     <!-- Landing Page (shown when not authenticated) -->
@@ -18,24 +25,34 @@
 
       <!-- Tool Preview Section -->
       <div class="relative max-w-4xl mx-auto bg-white rounded-lg shadow-lg p-8 mb-16">
-        <div class="opacity-50">
+        <!-- Tool interface preview -->
+        <div>
           <div class="border-2 border-dashed border-gray-300 rounded-lg p-8 text-center mb-4">
             <p class="text-gray-500">Drag & Drop Document 1 Here</p>
           </div>
           <div class="border-2 border-dashed border-gray-300 rounded-lg p-8 text-center mb-4">
             <p class="text-gray-500">Drag & Drop Document 2 Here</p>
           </div>
-          <button class="bg-blue-500 text-white px-6 py-2 rounded-md opacity-50 cursor-not-allowed">
-            Combine Documents
-          </button>
+          <!-- Combine button and lock on the same line -->
+          <div class="flex items-center justify-center gap-4 mt-4">
+            <button
+              class="bg-gray-300 text-gray-700 px-6 py-2 rounded-md cursor-not-allowed"
+              disabled
+            >
+              Combine Documents
+            </button>
+            <div class="flex items-center gap-2 bg-white bg-opacity-90 p-2 rounded-md shadow pointer-events-none">
+              <span class="text-xl">🔒</span>
+              <div class="text-left">
+                <p class="text-sm font-semibold text-gray-800">Tool Locked</p>
+                <p class="text-xs text-gray-600">Subscribe to unlock</p>
+              </div>
+            </div>
+          </div>
         </div>
 
-        <!-- Lock Overlay -->
-        <div class="absolute inset-0 bg-white bg-opacity-90 rounded-lg flex flex-col items-center justify-center">
-          <div class="text-6xl mb-4">🔒</div>
-          <p class="text-xl font-semibold text-gray-800">Tool Access Protected</p>
-          <p class="text-gray-600">Subscribe below to gain access</p>
-        </div>
+        <!-- Transparent overlay to block interaction without obscuring view -->
+        <div class="absolute inset-0 pointer-events-auto bg-transparent"></div>
       </div>
 
       <!-- Authentication Section -->
