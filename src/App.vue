@@ -14,12 +14,23 @@ What’s Changed:
         <div class="text-2xl font-bold text-gray-800">PageMender</div>
       </nav>
 
+
       <!-- Hero Section -->
       <div class="text-center py-16">
         <h1 class="text-5xl font-bold text-gray-900 mb-6">PageMender</h1>
-        <p class="text-xl text-gray-600 max-w-2xl mx-auto">
-          A powerful document merging tool that combines your Word documents seamlessly.
-          Perfect for combining reports, contracts, and documentation.
+        <p class="text-xl text-gray-600 max-w-2xl mx-auto leading-relaxed">
+          <span class="font-semibold">Tired of copy-pasting between Word documents?</span><br>
+          <span class="block mt-4">
+      <strong>PageMender</strong> helps you effortlessly combine multiple Word documents into a
+      single, professionally formatted file.
+    </span>
+          <span class="block mt-4">
+      Whether you're merging project reports, course materials, or research papers,
+      our web-based tool preserves your formatting while unifying documents in seconds. ✨
+    </span>
+          <span class="block mt-4">
+      Start merging your Word files now with <strong>PageMender</strong>.
+    </span>
         </p>
       </div>
 
