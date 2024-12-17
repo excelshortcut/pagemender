@@ -29,7 +29,7 @@
 
       <!-- Tool Preview Section -->
       <div class="relative max-w-4xl mx-auto bg-white rounded-lg shadow-lg p-8 mb-16">
-        <!-- Tool interface preview -->
+        <!-- Tool interface preview (locked state) -->
         <div>
           <div class="border-2 border-dashed border-gray-300 rounded-lg p-8 text-center mb-4">
             <p class="text-gray-500">Drag & Drop Document 1 Here</p>
@@ -60,10 +60,6 @@
       </div>
 
       <!-- Authentication Section -->
-      <!--
-        Stacked layout: "Unlock PageMender" section above the "No Access?" section.
-        Both sections now have a uniform style and ensure the email input is contained within the card.
-      -->
       <div class="max-w-2xl mx-auto text-center py-12">
 
         <!-- Unlock PageMender Card -->
@@ -130,9 +126,12 @@
     </div>
 
     <!-- Tool Interface (shown when authenticated) -->
+    <!-- Making the PageMender tool the primary focus by adding a third document field and keeping it at the top.
+         The feedback form remains at the bottom, making the tool appear more prominent. -->
     <div v-else class="max-w-4xl mx-auto px-4 py-8">
       <h1 class="text-3xl font-bold text-gray-900 mb-8">PageMender</h1>
       <div class="space-y-4">
+        <!-- Document 1 Drop Zone -->
         <div
           class="border-2 border-dashed border-gray-300 rounded-lg p-8 text-center hover:border-blue-500 transition-colors"
           @dragover.prevent="onDragOver"
@@ -142,6 +141,7 @@
           <p v-else class="text-gray-700">{{ doc1File.name }} uploaded</p>
         </div>
 
+        <!-- Document 2 Drop Zone -->
         <div
           class="border-2 border-dashed border-gray-300 rounded-lg p-8 text-center hover:border-blue-500 transition-colors"
           @dragover.prevent="onDragOver"
@@ -151,6 +151,17 @@
           <p v-else class="text-gray-700">{{ doc2File.name }} uploaded</p>
         </div>
 
+        <!-- Document 3 Drop Zone (New addition) -->
+        <div
+          class="border-2 border-dashed border-gray-300 rounded-lg p-8 text-center hover:border-blue-500 transition-colors"
+          @dragover.prevent="onDragOver"
+          @drop.prevent="onDrop($event, 'doc3')"
+        >
+          <p v-if="!doc3File" class="text-gray-500">Drag & Drop Document 3 Here (Optional)</p>
+          <p v-else class="text-gray-700">{{ doc3File.name }} uploaded</p>
+        </div>
+
+        <!-- Combine Documents Button and Feedback -->
         <div class="text-center">
           <button
             @click="mergeDocuments"
@@ -173,6 +184,70 @@
           </p>
         </div>
       </div>
+
+      <!-- Feedback Form (Visible when authenticated) -->
+      <!-- Placed below the now larger tool section to ensure the tool remains the main focus. -->
+      <div class="mt-12 bg-white rounded-lg shadow-sm p-6">
+        <h2 class="text-2xl font-bold text-gray-900 mb-4">Have feedback or encountered an issue?</h2>
+        <p class="text-gray-600 mb-8">We value your feedback. Please provide as much detail as possible.</p>
+
+        <!-- Validation or success messages -->
+        <p v-if="feedbackError" class="text-red-500 mb-4">{{ feedbackError }}</p>
+        <p v-if="feedbackSuccess" class="text-green-500 mb-4">{{ feedbackSuccess }}</p>
+
+        <form @submit.prevent="submitFeedback" class="space-y-4">
+          <!-- Type of Issue Dropdown -->
+          <div>
+            <label for="issueType" class="block mb-2 font-semibold text-gray-700">Type of Issue</label>
+            <select
+              id="issueType"
+              v-model="feedbackType"
+              class="w-full border border-gray-300 rounded-md px-4 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
+            >
+              <option>Bug</option>
+              <option>Feature Request</option>
+              <option>Feedback</option>
+            </select>
+          </div>
+
+          <!-- Feedback Note Textarea -->
+          <div>
+            <label for="feedbackNote" class="block mb-2 font-semibold text-gray-700">Feedback</label>
+            <textarea
+              id="feedbackNote"
+              v-model="feedbackNote"
+              rows="6"
+              class="w-full border border-gray-300 rounded-md px-4 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
+              placeholder="Describe your issue or provide feedback..."
+            ></textarea>
+          </div>
+
+          <!-- Attachment Upload -->
+          <div>
+            <label class="block mb-2 font-semibold text-gray-700">Attachment (Optional)</label>
+            <p class="text-sm text-gray-500 mb-2">Attach screenshot or supporting document (max 2MB)</p>
+            <input
+              type="file"
+              @change="handleFileUpload"
+              class="block w-full text-sm text-gray-700 border border-gray-300 rounded-md cursor-pointer focus:outline-none focus:ring-2 focus:ring-blue-500"
+            />
+          </div>
+
+          <!-- Submit Button -->
+          <div class="text-right">
+            <button
+              type="submit"
+              :disabled="feedbackSubmitting"
+              class="bg-blue-500 text-white px-6 py-2 rounded-md hover:bg-blue-600 disabled:opacity-50"
+            >
+              <span v-if="feedbackSubmitting">Submitting...</span>
+              <span v-else>Submit Feedback</span>
+            </button>
+          </div>
+        </form>
+      </div>
+      <!-- End of Feedback Form -->
+
     </div>
   </div>
 </template>
@@ -180,20 +255,24 @@
 <script>
 /*
   Overview:
-  This Vue component manages both locked (unauthenticated) and unlocked (authenticated) states.
-  Users either enter a password or subscribe to access. Once unlocked, they can drag & drop .docx
-  files and merge them.
+  This updated Vue component now includes a third document drop zone to expand the PageMender tool interface.
+  By adding the third document option, the tool section naturally becomes larger and remains the primary focus area.
+  The feedback form remains at the bottom, so users focus on the tool first.
 
-  Modular Functions:
-  - checkPassword: Validate input password
-  - onDragOver, onDrop: Handle drag & drop file inputs
-  - mergeDocuments: Combine two .docx files into one
-  - extractDocContent, readFileAsArrayBuffer: Utility to read and parse .docx files
+  Changes:
+  - Added doc3File and a corresponding drop zone.
+  - Updated mergeDocuments method to handle an optional third document.
+  - The PageMender tool is automatically the first visible area when authenticated,
+    as it appears above the feedback form.
 
   Clean Code:
-  - Meaningful naming
-  - Comments explain code intent
-  - Modular, reusable functions
+  - Meaningful variable names.
+  - Clear comments explaining new logic.
+  - Modular design principles maintained.
+
+  Assumptions:
+  - If doc3File is present, it will be included in the merged output.
+  - If doc3File is not present, only doc1 and doc2 are merged.
 */
 
 import { Document, Paragraph, Packer, TextRun } from 'docx';
@@ -208,27 +287,38 @@ export default {
       errorMessage: '',
       doc1File: null,
       doc2File: null,
+      doc3File: null, // New file state for third document
       merging: false,
       mergedFile: null,
+
+      // Feedback form state
+      feedbackType: 'Feedback',
+      feedbackNote: '',
+      feedbackFile: null,
+      feedbackSubmitting: false,
+      feedbackError: '',
+      feedbackSuccess: '',
     };
   },
   methods: {
-    // Check entered password against correct password
+    // Check if entered password matches correct password
     checkPassword() {
       if (this.inputPassword === this.correctPassword) {
         this.authenticated = true;
         this.errorMessage = '';
+        // Optionally, you could scroll to top or set focus on the tool if desired.
+        this.$nextTick(() => window.scrollTo(0, 0));
       } else {
         this.errorMessage = 'Incorrect password.';
       }
     },
 
-    // Allow drop action (copy)
+    // Handle drag-over event to indicate copy action
     onDragOver(event) {
       event.dataTransfer.dropEffect = 'copy';
     },
 
-    // Handle dropped file, assign to either doc1 or doc2
+    // Handle file drop for doc1, doc2, or doc3
     onDrop(event, docTarget) {
       const files = event.dataTransfer.files;
       if (
@@ -238,24 +328,42 @@ export default {
       ) {
         if (docTarget === 'doc1') {
           this.doc1File = files[0];
-        } else {
+        } else if (docTarget === 'doc2') {
           this.doc2File = files[0];
+        } else if (docTarget === 'doc3') {
+          this.doc3File = files[0];
         }
       } else {
         alert('Please drop a valid Word (.docx) file.');
       }
     },
 
-    // Merge two documents into a single file
+    // Merge up to three documents into a single file
     async mergeDocuments() {
       if (!this.doc1File || !this.doc2File) return;
       this.merging = true;
 
       try {
-        const [doc1Content, doc2Content] = await Promise.all([
+        const docContents = await Promise.all([
           this.extractDocContent(this.doc1File),
           this.extractDocContent(this.doc2File),
+          this.doc3File ? this.extractDocContent(this.doc3File) : Promise.resolve([])
         ]);
+
+        const [doc1Content, doc2Content, doc3Content] = docContents;
+
+        const paragraphs = [
+          ...doc1Content.map((text) => new Paragraph({ children: [new TextRun({ text })] })),
+          // Add a break between doc1 and doc2
+          new Paragraph({ children: [new TextRun({ text: '', break: true })] }),
+          ...doc2Content.map((text) => new Paragraph({ children: [new TextRun({ text })] })),
+        ];
+
+        if (doc3Content.length > 0) {
+          // Add another break between doc2 and doc3 if doc3File is present
+          paragraphs.push(new Paragraph({ children: [new TextRun({ text: '', break: true })] }));
+          paragraphs.push(...doc3Content.map((text) => new Paragraph({ children: [new TextRun({ text })] })));
+        }
 
         const doc = new Document({
           creator: 'PageMender',
@@ -264,22 +372,7 @@ export default {
           sections: [
             {
               properties: {},
-              children: [
-                ...doc1Content.map(
-                  (text) =>
-                    new Paragraph({
-                      children: [new TextRun({ text })],
-                    })
-                ),
-                // Add a blank paragraph (line break) between documents
-                new Paragraph({ children: [new TextRun({ text: '', break: true })] }),
-                ...doc2Content.map(
-                  (text) =>
-                    new Paragraph({
-                      children: [new TextRun({ text })],
-                    })
-                ),
-              ],
+              children: paragraphs,
             },
           ],
         });
@@ -316,7 +409,7 @@ export default {
         .filter((text) => text);
     },
 
-    // Read file as ArrayBuffer for parsing .docx
+    // Read file as ArrayBuffer for docx processing
     readFileAsArrayBuffer(file) {
       return new Promise((resolve, reject) => {
         const reader = new FileReader();
@@ -324,6 +417,69 @@ export default {
         reader.onerror = (error) => reject(error);
         reader.readAsArrayBuffer(file);
       });
+    },
+
+    // Handle attachment file upload for feedback form
+    handleFileUpload(event) {
+      const file = event.target.files[0];
+      if (file && file.size > 2 * 1024 * 1024) {
+        this.feedbackError = 'File size exceeds 2MB. Please choose a smaller file.';
+        event.target.value = ''; // reset file input
+        this.feedbackFile = null;
+      } else {
+        this.feedbackError = '';
+        this.feedbackFile = file || null;
+      }
+    },
+
+    // Submit the feedback form data
+    async submitFeedback() {
+      // Reset messages
+      this.feedbackError = '';
+      this.feedbackSuccess = '';
+
+      // Validate feedback note
+      if (!this.feedbackNote.trim()) {
+        this.feedbackError = 'Please provide some feedback or details.';
+        return;
+      }
+
+      // Double-check file size if attached
+      if (this.feedbackFile && this.feedbackFile.size > 2 * 1024 * 1024) {
+        this.feedbackError = 'File size exceeds 2MB. Please choose a smaller file.';
+        return;
+      }
+
+      const formData = new FormData();
+      formData.append('type', this.feedbackType);
+      formData.append('note', this.feedbackNote);
+      if (this.feedbackFile) {
+        formData.append('attachment', this.feedbackFile);
+      }
+
+      this.feedbackSubmitting = true;
+      try {
+        const response = await fetch('/api/feedback', {
+          method: 'POST',
+          body: formData,
+        });
+
+        if (!response.ok) {
+          throw new Error('Network response was not ok');
+        }
+
+        // Success
+        this.feedbackSuccess = 'Thank you for your feedback!';
+        // Reset form fields
+        this.feedbackType = 'Feedback';
+        this.feedbackNote = '';
+        this.feedbackFile = null;
+      } catch (error) {
+        console.error('Error submitting feedback:', error);
+        this.feedbackError = 'Oops, something went wrong. Please try again.';
+      } finally {
+        this.feedbackSubmitting = false;
+      }
     },
   },
 };
