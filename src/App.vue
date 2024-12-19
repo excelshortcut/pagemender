@@ -393,7 +393,7 @@ export default {
       formData.append('note', this.feedbackNote);
 
       if (this.feedbackFile) {
-        formData.append('attachment', this.feedbackFile);
+        formData.append('attachment', this.feedbackFile, this.feedbackFile.name);
       }
 
       this.feedbackSubmitting = true;
