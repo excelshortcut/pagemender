@@ -187,12 +187,10 @@
         <h2 class="text-2xl font-bold text-gray-900 mb-4">Have feedback or encountered an issue?</h2>
         <p class="text-gray-600 mb-8">We value your feedback. Please provide as much detail as possible.</p>
 
-        <!-- Validation or success messages -->
         <p v-if="feedbackError" class="text-red-500 mb-4">{{ feedbackError }}</p>
         <p v-if="feedbackSuccess" class="text-green-500 mb-4">{{ feedbackSuccess }}</p>
 
         <form @submit.prevent="submitFeedback" class="space-y-4">
-          <!-- Type of Issue Dropdown -->
           <div>
             <label for="issueType" class="block mb-2 font-semibold text-gray-700">Type of Issue</label>
             <select
@@ -200,13 +198,12 @@
               v-model="feedbackType"
               class="w-full border border-gray-300 rounded-md px-4 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
             >
-              <option>Bug</option>
-              <option>Feature Request</option>
-              <option>Feedback</option>
+              <option value="Bug">Bug</option>
+              <option value="Feature Request">Feature Request</option>
+              <option value="Feedback">Feedback</option>
             </select>
           </div>
 
-          <!-- Feedback Note Textarea -->
           <div>
             <label for="feedbackNote" class="block mb-2 font-semibold text-gray-700">Feedback</label>
             <textarea
@@ -218,20 +215,18 @@
             ></textarea>
           </div>
 
-          <!-- Attachment Upload -->
-          <!-- Attachment Upload -->
           <div>
             <label class="block mb-2 font-semibold text-gray-700">Attachment (Optional)</label>
             <p class="text-sm text-gray-500 mb-2">Attach screenshot or supporting file (max 2MB)</p>
             <input
+              ref="fileInput"
               type="file"
-              accept="image/*,application/pdf"
+              accept="image/png,image/jpeg,image/jpg,application/pdf"
               @change="handleFileUpload"
               class="block w-full text-sm text-gray-700 border border-gray-300 rounded-md cursor-pointer focus:outline-none focus:ring-2 focus:ring-blue-500"
             />
           </div>
 
-          <!-- Submit Button -->
           <div class="text-right">
             <button
               type="submit"
@@ -244,11 +239,10 @@
           </div>
         </form>
       </div>
-      <!-- End of Feedback Form -->
-
     </div>
   </div>
 </template>
+
 
 <script>
 import { Document, Paragraph, Packer, TextRun } from 'docx';
@@ -340,6 +334,7 @@ export default {
         this.mergedFile = URL.createObjectURL(blob);
       } catch (error) {
         console.error('Error merging documents:', error);
+        this.mergeError = 'An error occurred while merging documents.';
         alert('An error occurred while merging documents.');
       } finally {
         this.merging = false;
@@ -393,44 +388,39 @@ export default {
         return;
       }
 
-      if (this.feedbackFile && this.feedbackFile.size > 2 * 1024 * 1024) {
-        this.feedbackError = 'File size exceeds 2MB. Please choose a smaller file.';
-        return;
-      }
-
       const formData = new FormData();
       formData.append('type', this.feedbackType);
       formData.append('note', this.feedbackNote);
+
       if (this.feedbackFile) {
         formData.append('attachment', this.feedbackFile);
       }
 
       this.feedbackSubmitting = true;
+
       try {
         const response = await fetch('https://pagemender-5z6sn.ondigitalocean.app/api/feedback', {
           method: 'POST',
-          body: formData,
-          // Remove the Content-Type header - let the browser set it with the boundary
-          // when sending FormData
+          body: formData
         });
 
         if (!response.ok) {
-          const errorData = await response.json().catch(() => null);
-          throw new Error(errorData?.detail || 'Network response was not ok');
+          const errorData = await response.json();
+          throw new Error(errorData?.detail || 'Failed to submit feedback');
         }
 
         this.feedbackSuccess = 'Thank you for your feedback!';
-        this.feedbackType = 'Feedback';
+        this.feedbackType = 'Bug';
         this.feedbackNote = '';
         this.feedbackFile = null;
 
-        // Reset file input
+        // Reset file input using querySelector
         const fileInput = document.querySelector('input[type="file"]');
         if (fileInput) fileInput.value = '';
 
       } catch (error) {
         console.error('Error submitting feedback:', error);
-        this.feedbackError = error.message || 'Oops, something went wrong. Please try again.';
+        this.feedbackError = error.message || 'Failed to submit feedback. Please try again.';
       } finally {
         this.feedbackSubmitting = false;
       }
