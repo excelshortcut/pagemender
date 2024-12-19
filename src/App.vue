@@ -399,7 +399,7 @@ export default {
       this.feedbackSubmitting = true;
 
       try {
-        const response = await fetch('https://pagemender-5z6sn.ondigitalocean.app/api/feedback', {
+        const response = await fetch('http://157.245.14.203:8000/api/feedback/form', {
           method: 'POST',
           body: formData
         });
