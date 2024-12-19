@@ -61,7 +61,6 @@
 
       <!-- Authentication Section -->
       <div class="max-w-2xl mx-auto text-center py-12">
-
         <!-- Unlock PageMender Card -->
         <div class="flex flex-col items-center bg-white rounded-lg shadow-sm p-6 mb-8">
           <h2 class="text-3xl font-bold text-gray-900 mb-4">Unlock PageMender</h2>
@@ -126,8 +125,6 @@
     </div>
 
     <!-- Tool Interface (shown when authenticated) -->
-    <!-- Making the PageMender tool the primary focus by adding a third document field and keeping it at the top.
-         The feedback form remains at the bottom, making the tool appear more prominent. -->
     <div v-else class="max-w-4xl mx-auto px-4 py-8">
       <h1 class="text-3xl font-bold text-gray-900 mb-8">PageMender</h1>
       <div class="space-y-4">
@@ -186,7 +183,6 @@
       </div>
 
       <!-- Feedback Form (Visible when authenticated) -->
-      <!-- Placed below the now larger tool section to ensure the tool remains the main focus. -->
       <div class="mt-12 bg-white rounded-lg shadow-sm p-6">
         <h2 class="text-2xl font-bold text-gray-900 mb-4">Have feedback or encountered an issue?</h2>
         <p class="text-gray-600 mb-8">We value your feedback. Please provide as much detail as possible.</p>
@@ -253,28 +249,6 @@
 </template>
 
 <script>
-/*
-  Overview:
-  This updated Vue component now includes a third document drop zone to expand the PageMender tool interface.
-  By adding the third document option, the tool section naturally becomes larger and remains the primary focus area.
-  The feedback form remains at the bottom, so users focus on the tool first.
-
-  Changes:
-  - Added doc3File and a corresponding drop zone.
-  - Updated mergeDocuments method to handle an optional third document.
-  - The PageMender tool is automatically the first visible area when authenticated,
-    as it appears above the feedback form.
-
-  Clean Code:
-  - Meaningful variable names.
-  - Clear comments explaining new logic.
-  - Modular design principles maintained.
-
-  Assumptions:
-  - If doc3File is present, it will be included in the merged output.
-  - If doc3File is not present, only doc1 and doc2 are merged.
-*/
-
 import { Document, Paragraph, Packer, TextRun } from 'docx';
 import JSZip from 'jszip';
 
@@ -301,24 +275,18 @@ export default {
     };
   },
   methods: {
-    // Check if entered password matches correct password
     checkPassword() {
       if (this.inputPassword === this.correctPassword) {
         this.authenticated = true;
         this.errorMessage = '';
-        // Optionally, you could scroll to top or set focus on the tool if desired.
         this.$nextTick(() => window.scrollTo(0, 0));
       } else {
         this.errorMessage = 'Incorrect password.';
       }
     },
-
-    // Handle drag-over event to indicate copy action
     onDragOver(event) {
       event.dataTransfer.dropEffect = 'copy';
     },
-
-    // Handle file drop for doc1, doc2, or doc3
     onDrop(event, docTarget) {
       const files = event.dataTransfer.files;
       if (
@@ -337,30 +305,24 @@ export default {
         alert('Please drop a valid Word (.docx) file.');
       }
     },
-
-    // Merge up to three documents into a single file
     async mergeDocuments() {
       if (!this.doc1File || !this.doc2File) return;
       this.merging = true;
 
       try {
-        const docContents = await Promise.all([
+        const [doc1Content, doc2Content, doc3Content] = await Promise.all([
           this.extractDocContent(this.doc1File),
           this.extractDocContent(this.doc2File),
           this.doc3File ? this.extractDocContent(this.doc3File) : Promise.resolve([])
         ]);
 
-        const [doc1Content, doc2Content, doc3Content] = docContents;
-
         const paragraphs = [
           ...doc1Content.map((text) => new Paragraph({ children: [new TextRun({ text })] })),
-          // Add a break between doc1 and doc2
           new Paragraph({ children: [new TextRun({ text: '', break: true })] }),
           ...doc2Content.map((text) => new Paragraph({ children: [new TextRun({ text })] })),
         ];
 
         if (doc3Content.length > 0) {
-          // Add another break between doc2 and doc3 if doc3File is present
           paragraphs.push(new Paragraph({ children: [new TextRun({ text: '', break: true })] }));
           paragraphs.push(...doc3Content.map((text) => new Paragraph({ children: [new TextRun({ text })] })));
         }
@@ -369,12 +331,7 @@ export default {
           creator: 'PageMender',
           description: 'Merged document',
           title: 'Combined Document',
-          sections: [
-            {
-              properties: {},
-              children: paragraphs,
-            },
-          ],
+          sections: [{ properties: {}, children: paragraphs }],
         });
 
         const blob = await Packer.toBlob(doc);
@@ -386,8 +343,6 @@ export default {
         this.merging = false;
       }
     },
-
-    // Extract text from a .docx file
     async extractDocContent(file) {
       const arrayBuffer = await this.readFileAsArrayBuffer(file);
       const zip = new JSZip();
@@ -408,8 +363,6 @@ export default {
         })
         .filter((text) => text);
     },
-
-    // Read file as ArrayBuffer for docx processing
     readFileAsArrayBuffer(file) {
       return new Promise((resolve, reject) => {
         const reader = new FileReader();
@@ -418,33 +371,26 @@ export default {
         reader.readAsArrayBuffer(file);
       });
     },
-
-    // Handle attachment file upload for feedback form
     handleFileUpload(event) {
       const file = event.target.files[0];
       if (file && file.size > 2 * 1024 * 1024) {
         this.feedbackError = 'File size exceeds 2MB. Please choose a smaller file.';
-        event.target.value = ''; // reset file input
+        event.target.value = '';
         this.feedbackFile = null;
       } else {
         this.feedbackError = '';
         this.feedbackFile = file || null;
       }
     },
-
-    // Submit the feedback form data
     async submitFeedback() {
-      // Reset messages
       this.feedbackError = '';
       this.feedbackSuccess = '';
 
-      // Validate feedback note
       if (!this.feedbackNote.trim()) {
         this.feedbackError = 'Please provide some feedback or details.';
         return;
       }
 
-      // Double-check file size if attached
       if (this.feedbackFile && this.feedbackFile.size > 2 * 1024 * 1024) {
         this.feedbackError = 'File size exceeds 2MB. Please choose a smaller file.';
         return;
@@ -459,24 +405,30 @@ export default {
 
       this.feedbackSubmitting = true;
       try {
-        const response = await fetch('/api/feedback', {
+        const response = await fetch('https://pagemender-5z6sn.ondigitalocean.app/api/feedback', {
           method: 'POST',
           body: formData,
+          // Remove the Content-Type header - let the browser set it with the boundary
+          // when sending FormData
         });
 
         if (!response.ok) {
-          throw new Error('Network response was not ok');
+          const errorData = await response.json().catch(() => null);
+          throw new Error(errorData?.detail || 'Network response was not ok');
         }
 
-        // Success
         this.feedbackSuccess = 'Thank you for your feedback!';
-        // Reset form fields
         this.feedbackType = 'Feedback';
         this.feedbackNote = '';
         this.feedbackFile = null;
+
+        // Reset file input
+        const fileInput = document.querySelector('input[type="file"]');
+        if (fileInput) fileInput.value = '';
+
       } catch (error) {
         console.error('Error submitting feedback:', error);
-        this.feedbackError = 'Oops, something went wrong. Please try again.';
+        this.feedbackError = error.message || 'Oops, something went wrong. Please try again.';
       } finally {
         this.feedbackSubmitting = false;
       }
