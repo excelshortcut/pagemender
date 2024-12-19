@@ -219,11 +219,13 @@
           </div>
 
           <!-- Attachment Upload -->
+          <!-- Attachment Upload -->
           <div>
             <label class="block mb-2 font-semibold text-gray-700">Attachment (Optional)</label>
-            <p class="text-sm text-gray-500 mb-2">Attach screenshot or supporting document (max 2MB)</p>
+            <p class="text-sm text-gray-500 mb-2">Attach screenshot or supporting file (max 2MB)</p>
             <input
               type="file"
+              accept="image/*,application/pdf"
               @change="handleFileUpload"
               class="block w-full text-sm text-gray-700 border border-gray-300 rounded-md cursor-pointer focus:outline-none focus:ring-2 focus:ring-blue-500"
             />
