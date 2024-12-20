@@ -399,7 +399,7 @@ export default {
       this.feedbackSubmitting = true;
 
       try {
-        const response = await fetch('http://157.245.14.203:8000/api/feedback/form', {
+        const response = await fetch('https://api.pagemender.com/api/feedback/form', {
           method: 'POST',
           body: formData
         });
