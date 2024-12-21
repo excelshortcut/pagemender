@@ -93,7 +93,7 @@
           <div class="w-full max-w-md mx-auto">
             <!-- Begin Mailchimp Signup Form -->
             <form
-              action="https://excelshortcut.us20.list-manage.com/subscribe/post?u=753605d7a4378f7975e2f4941&id=01779f56c2"
+              action="https://excelshortcut.us20.list-manage.com/subscribe/post?u=753605d7a4378f7975e2f4941&id=01779f56c2&tags=pagemenderps"
               method="post"
               target="_blank"
               novalidate
@@ -106,7 +106,7 @@
                 class="flex-1 px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
                 required
               />
-              <input type="hidden" name="tags" value="pagemenderps" />
+
               <input
                 type="submit"
                 value="Get Access"
