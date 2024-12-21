@@ -107,6 +107,8 @@
                 required
               />
 
+              <input type="hidden" name="MMERGE7" value="PageMender" />
+
               <input
                 type="submit"
                 value="Get Access"
