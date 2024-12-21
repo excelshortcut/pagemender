@@ -107,7 +107,13 @@
                 required
               />
 
-              <input type="text" name="MMERGE7" value="PageMender" style="display: none;" autocomplete="off" />
+              <input
+                type="text"
+                name="MMERGE7"
+                value="PageMender"
+                style="position: absolute; left: -9999px;"
+                autocomplete="off"
+              />
 
               <input
                 type="submit"
