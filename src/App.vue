@@ -107,7 +107,7 @@
                 required
               />
 
-              <input type="text" name="MMERGE7" placeholder="Enter source" />
+              <input type="text" name="MMERGE7" value="PageMender" autocomplete="off" />
 
               <input
                 type="submit"
